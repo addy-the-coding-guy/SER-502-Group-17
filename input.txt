@@ -1,0 +1,7 @@
+PSTART 
+    LOAD A, 10
+    LOAD B, 20
+    ADD A, B
+    LOAD C, A
+    PRINT C
+PEND
