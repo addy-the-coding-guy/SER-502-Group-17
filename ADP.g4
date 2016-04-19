@@ -1,11 +1,16 @@
 grammar ADP;
 
-program
+context
 : globalDeclarationList LINEBREAK functionDeclarationList LINEBREAK mainFunction
 ;
 
 globalDeclarationList
-: global':' LINEBREAK declarationList LINEBREAK end global
+: GLOBAL ':' LINEBREAK declarationList LINEBREAK ENDGLOBAL
+;
+
+declarationList
+: typeSpecifier VARIABLENAME ';'
+| typeSpecifier VARIABLENAME ';' LINEBREAK declarationList 
 ;
 
 functionDeclarationList
@@ -13,18 +18,18 @@ functionDeclarationList
 ;
 
 functions
-: function
-| functions LINEBREAK function
+: function LINEBREAK functions
+| function
 ;
 
 function
-: fun functionName (paramList): LINEBREAK statements LINEBREAK endOfFunction
-| fun functionName (): LINEBREAK statements LINEBREAK endOfFunction
+: FUN functionName LP paramList RP ':' LINEBREAK statements LINEBREAK ENDFUN
+| FUN functionName LP RP ':' LINEBREAK statements LINEBREAK ENDFUN
 ;
 
 paramList
 : parameter
-| paramList ',' parameter
+| parameter ',' paramList
 ;
 
 parameter
@@ -32,42 +37,66 @@ parameter
 ;
 
 typeSpecifier
-: 'int'
-| 'bool'
+: INT
+| BOOL
 ;
 
 mainFunction
-: main()
+: MAINFUN LP RP ':' LINEBREAK statements LINEBREAK ENDFUN  
 ;
 
 statements
-: expressions
+: declarationList 
+| assignment 
+| callfun  
 ;
 
 expressions
-: expression
-| expressions LINEBREAK expression
+: expr
+| expr LINEBREAK expressions
 ;
 
-expression
-: expr ASSIGN expr
-| expr -' expr
+expr
+: expr '-' expr
 | expr '+' expr
 | expr '*' expr
-| expr '\' expr
-| '('expr')'
-|'{'expr'}'
+| expr '\\' expr
+| LP expr RP
+| '{'expr'}'
+| VARIABLENAME
+| NUMBER
+;
+
+assignment
+: VARIABLENAME ASSIGN value ';'
+;
+
+value
+: expr
+| NUMBER
+| VARIABLENAME
 ;
 
 
-endOfFunction
-: end fun
+callfun
+: functionName LP VARIABLENAME RP ';'
 ;
 
-global: GLOBAL;
-end global: END GLOBAL;
-LINEBREAK: '\n';
-VARIABLENAME: [a-z_][a-zA-Z0-9]*;
-INT: 'int';
-BOOL: 'bool';
+
+functionName: VARIABLENAME ;
+
+MAINFUN: 'main' ;
+LP: '(';
+RP: ')';
+FUN: 'fun';
+ENDFUN: 'endfunction' ;
+
+GLOBAL: 'global' ;
+ENDGLOBAL: 'endglobal' ;
+
+LINEBREAK: [ \t\r\n]+ -> skip ;
+VARIABLENAME: [a-z_][a-zA-Z0-9]* ;
+NUMBER: [0-9]+;
+INT: 'int' ;
+BOOL: 'bool' ;
 ASSIGN: '=';
