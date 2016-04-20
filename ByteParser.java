@@ -1,3 +1,4 @@
+
 import java.io.*;
 import java.lang.*;
 import java.util.*;
@@ -420,7 +421,13 @@ class Runtime {
         else {
             currentOperand1 = currentScope + operand1;
         }
-        System.out.println(globalSymbolTable.get(currentOperand1));
+        if(globalSymbolTable.get(currentOperand1) != null) {
+            System.out.println(globalSymbolTable.get(currentOperand1));
+        }
+        else {
+
+            System.out.println("The variable " + operand1 + " was never initialized in this scope");
+        }
     }
 
     public void fun() {
