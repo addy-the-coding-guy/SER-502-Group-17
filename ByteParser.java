@@ -3,11 +3,12 @@ import java.io.*;
 import java.lang.*;
 import java.util.*;
 
-public class ByteParser{
 
+public class ByteParser{
+    static String line = null;
     public static void main(String []args){
         String fileName = "input.txt";
-        String line = null;
+
         String[] parsedInstruction = new String[3];
 
         try {
@@ -39,6 +40,7 @@ public class ByteParser{
 }
 
 class Runtime {
+
     private String statement = new String("") ;
     private String opCode = new String("") ;
     private String operands = new String("") ;
@@ -148,14 +150,18 @@ class Runtime {
                 this.eql();
                 break;
             case "GRE":
+                this.greater();
                 break;
             case "LES":
                 break;
             case "GEQ":
+                this.greaterOrEqual();
                 break;
             case "LEQ":
+                this.lessOrEqual();
                 break;
             case "NOT":
+                this.not();
                 break;
             case "FUN":
                 this.fun();
@@ -166,8 +172,7 @@ class Runtime {
             case "CALL":
                 break;
             case "IFT":
-                break;
-            case "ELS":
+                this.ift();
                 break;
             case "LOOP":
                 break;
@@ -436,6 +441,162 @@ class Runtime {
 
     public void endfun() {
         callStack.removeFirst();
+    }
+
+    // greater or equal needs updating
+    public void greaterOrEqual() {
+        // greater or equal
+    }
+
+    public void lessOrEqual() {
+        // less than or equal
+    }
+
+    public void not() {
+        // not operator
+    }
+
+    public void greater() {
+        // greater?
+    }
+
+    public void ift() {
+        // if true
+        // get the operands
+        String currentScope = callStack.peekFirst();
+        // if current operands do not have numbers
+        String currentOperand1 = new String("") ;
+        String currentOperand2 = new String("");
+
+        String ifOperand1 = new String("");
+        String ifOperand2 = new String("");
+
+        String ifOperator = new String("");
+        // the expression is in operand1
+        // parse operand1
+        // parsing for the first operand in the conditional expression
+        int startIndex = 3;
+        int endIndex = 0;
+        if(operands.indexOf(">") != -1) {
+            endIndex = operands.indexOf(">");
+            ifOperator = ">";
+        }
+        else if(operands.indexOf("<") != -1) {
+            endIndex = operands.indexOf("<");
+            ifOperator = "<";
+        }
+        else if(operands.indexOf("<=") != -1) {
+            endIndex = operands.indexOf("<=");
+            ifOperator = "<=";
+        }
+        else if(operands.indexOf(">=") != -1) {
+            endIndex = operands.indexOf(">=");
+            ifOperator = ">=";
+        }
+        else if(operands.indexOf("==") != -1) {
+            endIndex = operands.indexOf("==");
+            ifOperator = "==";
+        }
+        else if(operands.indexOf("!=") != -1) {
+            endIndex = operands.indexOf("!=");
+            ifOperator = "!=";
+        }
+
+        if(startIndex != -1 && endIndex != -1) {
+            ifOperand1 = statement.substring(startIndex + 1, endIndex).trim();
+
+        }
+
+        else if(startIndex != -1 && endIndex == -1 ){
+            endIndex = operands.length();
+            ifOperand1 = statement.substring(startIndex + 1,endIndex).trim();
+        }
+
+        // setting first operand to null for instructions with no operands
+        else {
+            ifOperand1 = null;
+        }
+
+        // parsing for the second operand
+        startIndex = endIndex;
+        endIndex = operands.length();
+        if(startIndex != -1 && endIndex != -1 ) {
+            ifOperand2 = statement.substring(startIndex + 2, endIndex).trim();
+
+        }
+
+        else if(startIndex == -1 ) {
+            ifOperand2 = null;
+        }
+
+        System.out.println(ifOperator);
+        System.out.println(ifOperand1);
+        System.out.println(ifOperand2);
+
+        int intOperand1 = 0;
+        int intOperand2 = 0;
+
+        if (ifOperand1 != null && ifOperand2 != null) {
+            // check if both are variables or values
+            // check if the second operand is numeric or a variable
+            if (currentScope.equals("main")) {
+                currentOperand1 = ifOperand1;
+                currentOperand2 = ifOperand2;
+                System.out.println(globalSymbolTable.get(currentOperand1));
+               intOperand1 = Integer.parseInt(globalSymbolTable.get(currentOperand1));
+
+            }
+            else {
+                currentOperand1 = currentScope + ifOperand1;
+                intOperand1 = Integer.parseInt(globalSymbolTable.get(currentOperand1));
+                char c = ifOperand2.charAt(0);
+                if(Character.isLetter(c)) {
+                    currentOperand2 = currentScope + ifOperand2;
+                    intOperand2 = Integer.parseInt(globalSymbolTable.get(currentOperand2));
+                }
+                else {
+                    currentOperand2 = ifOperand2;
+                    intOperand2 = Integer.parseInt(ifOperand2);
+                }
+            }
+            // evaluate the expression
+            boolean result = false;
+            switch(ifOperator) {
+                case ">":
+                    if(intOperand1 > intOperand2)
+                        result = true;
+                    break;
+                case ">=":
+                    if(intOperand1 >= intOperand2)
+                        result = true;
+                    break;
+                case "<":
+                    if(intOperand1 < intOperand2)
+                        result = true;
+                    break;
+                case "<=":
+                    if(intOperand1 <= intOperand2)
+                        result = true;
+                    break;
+                case "==":
+                    if(intOperand1 == intOperand2)
+                        result = true;
+                    break;
+                case "!=":
+                    if(intOperand1 != intOperand2)
+                        result = true;
+                    break;
+            }
+            // if expression is true, execute statements until you encounter endift
+            if(result) {
+                // execute until you reach endift beginning with ift
+            }
+            // if expression is false, search for els statement following endift and execute till endels
+            else {
+                // execute until you reach endels beginning with els
+            }
+        }
+
     }
 
 }
