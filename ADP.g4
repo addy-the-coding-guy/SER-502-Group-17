@@ -57,10 +57,12 @@ expressions
 ;
 
 expr
-: expr '-' NUMBER
-| expr '+' NUMBER
-| expr '*' NUMBER
-| expr '\\' NUMBER
+: expr '-' expr
+| expr '+' expr
+| expr '*' expr
+| expr '\\' expr
+| LP expr RP
+| '{'expr'}'
 | VARIABLENAME
 | NUMBER
 ;
