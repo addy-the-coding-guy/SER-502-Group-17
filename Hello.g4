@@ -1,4 +1,4 @@
-grammar ADP;
+grammar Hello;
 
 context
 : globalDeclarationList LINEBREAK functionDeclarationList LINEBREAK mainFunction
