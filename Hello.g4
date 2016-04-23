@@ -1,4 +1,4 @@
-grammar Hello;
+grammar ADP;
 
 context
 : globalDeclarationList LINEBREAK functionDeclarationList LINEBREAK mainFunction
@@ -75,6 +75,7 @@ value
 : expr
 | NUMBER
 | VARIABLENAME
+| callfun
 ;
 
 
