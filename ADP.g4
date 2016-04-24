@@ -1,103 +1,162 @@
 grammar ADP;
 
-context
-: globalDeclarationList LINEBREAK functionDeclarationList LINEBREAK mainFunction
+program
+: (vardeclaration)*(fundeclaration)* mainblock
 ;
 
-globalDeclarationList
-: GLOBAL ':' LINEBREAK declarationList LINEBREAK ENDGLOBAL
+mainblock
+: 'main''('')' mainbody 'endmain'
 ;
 
-declarationList
-: typeSpecifier VARIABLENAME ';'
-| typeSpecifier VARIABLENAME ';' LINEBREAK declarationList 
+mainbody
+: statementlist
 ;
 
-functionDeclarationList
-: functions
+statementlist
+: statements+
 ;
 
-functions
-: function LINEBREAK functions
-| function
+vardeclaration
+: typespecifier varname Assign literal LINEBREAK
+| typespecifier varname LINEBREAK
+| typespecifier varname
 ;
 
-function
-: FUN functionName LP paramList RP ':' LINEBREAK statements LINEBREAK ENDFUN
-| FUN functionName LP RP ':' LINEBREAK statements LINEBREAK ENDFUN
+varname
+: String
 ;
 
-paramList
-: parameter
-| parameter ',' paramList
+fundeclaration
+: returntypespecifier 'fun' functionname '(' paramlist ')' 'startfun' statements+ 'endfun'
 ;
 
-parameter
-: typeSpecifier VARIABLENAME
+paramlist
+: typespecifier argumentlist
 ;
 
-typeSpecifier
-: INT
-| BOOL
+returntypespecifier
+: typespecifier
 ;
 
-mainFunction
-: MAINFUN LP RP ':' LINEBREAK statements LINEBREAK ENDFUN  
+typespecifier
+: 'integer'
+| 'boolean'
 ;
 
 statements
-: declarationList 
-| assignment 
-| callfun  
+: booleanstatement
+| assignmentstatement
+| conditionalstatement
+| declarationstatement
+| loopingstatement 
+| arithmeticstatement 
+| printstatement
+| functioncall
 ;
 
-expressions
+booleanstatement
+: 'boolean' varname Assign booleanliteral LINEBREAK
+| 'boolean' varname LINEBREAK
+;
+
+declarationstatement
+: 'integer' varname Assign expr LINEBREAK
+| 'boolean' varname Assign expr LINEBREAK
+| 'integer' varname LINEBREAK
+| 'boolean' varname LINEBREAK
+;
+
+conditionalstatement
+: 'if' '('conditionalexpression')' 'startif' statements+ 'endif'
+| 'else''startels' statements+ 'endels'
+;
+
+loopingstatement
+:'while' '('conditionalexpression')' 'startwhile' statements+ 'endwhile'
+;
+
+conditionalexpression
+: BooleanLiteral
+|expr conditionaloperator expr 
+;
+
+conditionaloperator
+: '>'| '>='| '<'| '<='| '=='| '!=' | booleanliteral ; 
+
+arithmeticstatement
 : expr
-| expr LINEBREAK expressions
+;
+
+printstatement
+: 'print' (varname|literallist) LINEBREAK
+| 'print' '\''(String)+ '\'' LINEBREAK
+;
+
+functioncall
+: functionname '('argumentlist')' LINEBREAK;
+
+argumentlist
+: literallist
+| varname
+| varname ','
+;
+
+assignmentstatement
+: varname Assign expr LINEBREAK
 ;
 
 expr
 : expr '-' expr
 | expr '+' expr
 | expr '*' expr
-| expr '\\' expr
-| LP expr RP
+| expr '/' expr
+| expr '%' expr
+| '(' expr ')'
 | '{'expr'}'
-| VARIABLENAME
-| NUMBER
+| booleanliteral
+| varname
+| literal
 ;
 
-assignment
-: VARIABLENAME ASSIGN value ';'
+literallist
+:literal
+| literal ','
+| booleanliteral
 ;
 
-value
-: expr
-| NUMBER
-| VARIABLENAME
-| callfun
+functionname
+: String
 ;
 
+String
+: [a-zA-Z_]+[a-zA-Z_.0-9:]*
+;
+literal
+: numericLiteral
+| booleanliteral
+| String
+;
+numericLiteral
+: NumericLiteral;
 
-callfun
-: functionName LP VARIABLENAME RP ';'
+NumericLiteral
+: [0-9]+
+;
+LINEBREAK
+: ';'
 ;
 
+booleanliteral
+: BooleanLiteral
+;
 
-functionName: VARIABLENAME ;
+BooleanLiteral
+: 'true'
+| 'false'
+;
 
-MAINFUN: 'main' ;
-LP: '(';
-RP: ')';
-FUN: 'fun';
-ENDFUN: 'endfunction' ;
+Assign
+: '='
+;
 
-GLOBAL: 'global' ;
-ENDGLOBAL: 'endglobal' ;
-
-LINEBREAK: [ \t\r\n]+ -> skip ;
-VARIABLENAME: [a-z_][a-zA-Z0-9]* ;
-NUMBER: [0-9]+;
-INT: 'int' ;
-BOOL: 'bool' ;
-ASSIGN: '=';
+WS: [ \n\t\r]+ -> skip;
